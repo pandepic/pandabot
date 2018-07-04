@@ -1,5 +1,5 @@
 screeps.json
-/dist/*.js
+dist/
 
 # Logs
 logs
