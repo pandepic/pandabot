@@ -3,7 +3,7 @@ var globals = require('globals');
 module.exports = {
 
     run: function (creep) {
-        
+
         if (creep.carry.energy < creep.carryCapacity) {
             var sources = creep.room.find(FIND_SOURCES);
 
@@ -15,6 +15,8 @@ module.exports = {
                 }
             }
 
+        } else if (creep.carry.energy == creep.carryCapacity) {
+            //
         }
 
     }
