@@ -59,6 +59,44 @@ function handleRoads() {
                 });
             }
         });
+
+        var controller = spawn.room.controller;
+
+        if (controller != null) {
+            var needsRoad = true;
+
+            var closestSite = controller.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES, {
+                filter: object => object.structureType == STRUCTURE_ROAD
+            });
+
+            var closestRoad = controller.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: object => object.structureType == STRUCTURE_ROAD
+            });
+
+            if (closestSite != null) {
+                if (controller.pos.getRangeTo(closestSite) == 1) {
+                    needsRoad = false;
+                }
+            }
+            
+            if (closestRoad != null) {
+                if (controller.pos.getRangeTo(closestRoad) == 1) {
+                    needsRoad = false;
+                }
+            }
+
+            if (needsRoad) {
+                var path = spawn.pos.findPathTo(controller.pos, {
+                    ignoreCreeps: true,
+                });
+    
+                path.forEach(p => {
+                    var pos = new RoomPosition(p.x, p.y, spawn.pos.roomName);
+                    pos.createConstructionSite(STRUCTURE_ROAD);
+                });
+            }
+        }
+        
     }
 }
 
