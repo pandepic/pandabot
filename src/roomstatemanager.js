@@ -116,23 +116,45 @@ function handleEnergyHarvesting() {
                 });
                 
             } else { // does the harvester need a collector?
-                if (existingHarvester.memory.collector == null || Game.creeps[existingHarvester.memory.collector] == null) {
-                    var needsNewCollector = true;
+                if (existingHarvester.memory.desiredCollectors == null) {
+                    var path = spawn.pos.findPathTo(existingHarvester.pos, {
+                        ignoreCreeps: true,
+                    });
 
-                    // look for existing collectors without a target
+                    if (path != null && path.length > 0) {
+                        existingHarvester.memory.desiredCollectors = 1 + parseInt(path.length / 10);
+                    } else {
+                        existingHarvester.memory.desiredCollectors = 1;
+                    }
+                }
+
+                var collectorCount = 0;
+
+                for (var name in Game.creeps) {
+                    var creep = Game.creeps[name];
+                    if (creep.memory.role == 'collector') {
+                        if (creep.memory.target == existingHarvester.name) {
+                            collectorCount += 1;
+                        }
+                    }
+                }
+
+                existingHarvester.memory.currentCollectors = collectorCount;
+
+                if (collectorCount < parseInt(existingHarvester.memory.desiredCollectors)) {
                     for (var name in Game.creeps) {
                         var creep = Game.creeps[name];
                         if (creep.memory.role == 'collector') {
                             if (creep.memory.target == 'MISSING') {
-                                needsNewCollector = false;
                                 creep.memory.target = existingHarvester.name;
                                 existingHarvester.memory.collector = creep.name;
                                 existingHarvester.say('⭐');
+                                collectorCount += 1;
                             }
                         }
                     }
 
-                    if (needsNewCollector) {
+                    if (collectorCount < parseInt(existingHarvester.memory.desiredCollectors)) {
                         var newCreep = new collector.BasicCollector();
                     
                         var newName = spawnManager.spawnCreep(spawn, newCreep, {
@@ -143,9 +165,11 @@ function handleEnergyHarvesting() {
                         if (newName != false) {
                             existingHarvester.say('⭐');
                             existingHarvester.memory.collector = newName;
+                            collectorCount += 1;
                         }
                     }
                 }
+
             }
         } // check energy sources
     }
