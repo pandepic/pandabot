@@ -57,6 +57,11 @@ module.exports = {
 
                 if (site != null) {
                     creep.memory.targetSite = site.id;
+                } else {
+                    creep.memory.mode = 'repair';
+                    creep.memory.targetSite = 'N/A';
+                    creep.say('🛠️');
+                    return;
                 }
             } else {
                 var targetSite = Game.getObjectById(creep.memory.targetSite);
@@ -89,13 +94,18 @@ module.exports = {
                 }
             } else {
                 var targetStructure = Game.getObjectById(creep.memory.targetStructure);
-                var repairResult = creep.repair(targetSite);
+                var repairResult = creep.repair(targetStructure);
 
                 if (repairResult == ERR_NOT_IN_RANGE) {
                     creep.moveTo(targetStructure);
                 } else if (repairResult != OK) {
                     creep.memory.mode = 'harvest';
-                    creep.memory.targetSite = 'N/A';
+                    creep.memory.targetStructure = 'N/A';
+                    creep.say('⛏️');
+                    return;
+                } else if (targetStructure.hits == targetStructure.hitsMax) {
+                    creep.memory.mode = 'harvest';
+                    creep.memory.targetStructure = 'N/A';
                     creep.say('⛏️');
                     return;
                 }
