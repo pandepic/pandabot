@@ -10,10 +10,9 @@ module.exports = {
     
     run: function () {
         
-        handleRoads();
-        handleBuilders();
         handleEnergyHarvesting();
-
+        //handleRoads();
+        handleBuilders();
 
     }
 
@@ -41,6 +40,25 @@ function handleRoads() {
 function handleBuilders() {
     for (var name in Game.spawns) {
         var spawn = Game.spawns[name];
+        var builderCount = 0;
+
+        for (var name in Game.creeps) {
+            var creep = Game.creeps[name];
+
+            if (creep.memory.role == 'builder') {
+                if (creep.memory.creator == spawn.name) {
+                    builderCount += 1;
+                }
+            }
+        }
+
+        if (builderCount < 5) {
+            var newCreep = new builder.BasicBuilder();
+
+            var newName = spawnManager.spawnCreep(spawn, newCreep, {
+                creator: spawn.name,
+            });
+        }
     }
 }
 
@@ -97,8 +115,10 @@ function handleEnergyHarvesting() {
                             target: existingHarvester.name,
                         });
 
-                        existingHarvester.memory.collector = newName;
-                        existingHarvester.say('⭐');
+                        if (newName != false) {
+                            existingHarvester.say('⭐');
+                            existingHarvester.memory.collector = newName;
+                        }
                     }
                 }
             }
