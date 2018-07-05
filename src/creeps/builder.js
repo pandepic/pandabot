@@ -63,7 +63,7 @@ module.exports = {
                 var buildResult = creep.build(targetSite);
 
                 if (buildResult == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targetSite, {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.moveTo(targetSite);
                 } else if (buildResult != OK) {
                     creep.memory.mode = 'harvest';
                     creep.memory.targetSite = 'N/A';
@@ -80,7 +80,7 @@ module.exports = {
             }
 
             if (creep.memory.targetStructure == 'N/A') {
-                var damagedStructure = creep.pos.findClosestByPath(FIND_STRUCTURES,{
+                var damagedStructure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: object => object.hits < object.hitsMax
                 });
 
@@ -92,7 +92,7 @@ module.exports = {
                 var repairResult = creep.repair(targetSite);
 
                 if (repairResult == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targetStructure, {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.moveTo(targetStructure);
                 } else if (repairResult != OK) {
                     creep.memory.mode = 'harvest';
                     creep.memory.targetSite = 'N/A';

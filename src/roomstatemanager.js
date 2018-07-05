@@ -11,7 +11,7 @@ module.exports = {
     run: function () {
         
         handleEnergyHarvesting();
-        //handleRoads();
+        handleRoads();
         handleBuilders();
 
     }
@@ -25,14 +25,39 @@ function handleRoads() {
         var energySources = spawn.room.find(FIND_SOURCES);
 
         energySources.forEach(source => {
-            var path = spawn.pos.findPathTo(source.pos, {
-                ignoreCreeps: true,
+
+            var closestSite = source.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES, {
+                filter: object => object.structureType == STRUCTURE_ROAD
             });
 
-            path.forEach(p => {
-                var pos = new RoomPosition(p.x, p.y, spawn.pos.roomName);
-                pos.createConstructionSite(STRUCTURE_ROAD);
+            var closestRoad = source.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: object => object.structureType == STRUCTURE_ROAD
             });
+
+            var needsRoad = true;;
+
+            if (closestSite != null) {
+                if (source.pos.getRangeTo(closestSite) == 1) {
+                    needsRoad = false;
+                }
+            }
+            
+            if (closestRoad != null) {
+                if (source.pos.getRangeTo(closestRoad) == 1) {
+                    needsRoad = false;
+                }
+            }
+
+            if (needsRoad) {
+                var path = spawn.pos.findPathTo(source.pos, {
+                    ignoreCreeps: true,
+                });
+    
+                path.forEach(p => {
+                    var pos = new RoomPosition(p.x, p.y, spawn.pos.roomName);
+                    pos.createConstructionSite(STRUCTURE_ROAD);
+                });
+            }
         });
     }
 }

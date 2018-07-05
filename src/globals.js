@@ -1,6 +1,11 @@
 module.exports.spawnReserved = [];
 module.exports.maxBodySize = 50;
 
+module.exports.minXPos = 0;
+module.exports.maxXPos = 49;
+module.exports.minYPos = 0;
+module.exports.maxYPos = 49;
+
 module.exports.isSpawnReserved = function (spawnPoint) {
     for (var i in this.spawnReserved) {
         if (this.spawnReserved[i] == spawnPoint.name) {
