@@ -6,6 +6,17 @@ module.exports.maxXPos = 49;
 module.exports.minYPos = 0;
 module.exports.maxYPos = 49;
 
+module.exports.surroundingTiles = [
+    {x: -1, y: -1}, // top left
+    {x: 0, y: -1}, // top middle
+    {x: 1, y: -1}, // top right
+    {x: -1, y: 0}, // left
+    {x: 1, y: 0}, // right
+    {x: -1, y: 1}, // bottom left
+    {x: 0, y: 1}, // bottom middle
+    {x: 1, y: 1}, // bottom right
+];
+
 module.exports.isSpawnReserved = function (spawnPoint) {
     for (var i in this.spawnReserved) {
         if (this.spawnReserved[i] == spawnPoint.name) {

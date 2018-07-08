@@ -14,12 +14,57 @@ module.exports = {
         
         handleEnergyHarvesting();
         handleRoads();
+        handleContainers();
         handleBuilders();
         handleUpgraders();
 
     }
 
 };
+
+function handleContainers() {
+    for (var name in Game.spawns) {
+        var spawn = Game.spawns[name];
+
+        var energySources = spawn.room.find(FIND_SOURCES);
+
+        energySources.forEach(source => {
+            var needsContainer = true;
+
+            var closestContainer = source.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES, {
+                filter: object => object.structureType == STRUCTURE_CONTAINER
+            });
+
+            var closestContainerComplete = source.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: object => object.structureType == STRUCTURE_CONTAINER
+            });
+
+            if (closestContainer != null) {
+                if (source.pos.getRangeTo(closestContainer) == 1) {
+                    needsContainer = false;
+                }
+            }
+
+            if (closestContainerComplete != null) {
+                if (source.pos.getRangeTo(closestContainerComplete) == 1) {
+                    needsContainer = false;
+                }
+            }
+
+            for (var i = 0; i < globals.surroundingTiles.length; i++) {
+                var offsets = globals.surroundingTiles[i];
+                if (needsContainer == true) {
+                    var pos = new RoomPosition(source.pos.x + offsets.x, source.pos.y + offsets.y, source.pos.roomName);
+
+                    if (Game.map.getTerrainAt(pos) != 'wall') {
+                        pos.createConstructionSite(STRUCTURE_CONTAINER);
+                        needsContainer = false;
+                    }
+                }
+            }
+        });
+    }
+}
 
 function handleUpgraders() {
     for (var name in Game.spawns) {
@@ -51,7 +96,7 @@ function handleUpgraders() {
 
         }
 
-        if (upgraderCount < 1) {
+        if (upgraderCount < 3) {
             var newCreep = new upgrader.BasicUpgrader();
 
             var newName = spawnManager.spawnCreep(spawn, newCreep, {
@@ -88,6 +133,15 @@ function handleRoads() {
             if (closestRoad != null) {
                 if (source.pos.getRangeTo(closestRoad) == 1) {
                     needsRoad = false;
+
+                    var path = spawn.pos.findPathTo(closestRoad.pos, {
+                        ignoreCreeps: true,
+                    });
+        
+                    path.forEach(p => {
+                        var pos = new RoomPosition(p.x, p.y, spawn.pos.roomName);
+                        pos.createConstructionSite(STRUCTURE_ROAD);
+                    });
                 }
             }
 
@@ -125,6 +179,15 @@ function handleRoads() {
             if (closestRoad != null) {
                 if (controller.pos.getRangeTo(closestRoad) == 1) {
                     needsRoad = false;
+
+                    var path = spawn.pos.findPathTo(closestRoad.pos, {
+                        ignoreCreeps: true,
+                    });
+        
+                    path.forEach(p => {
+                        var pos = new RoomPosition(p.x, p.y, spawn.pos.roomName);
+                        pos.createConstructionSite(STRUCTURE_ROAD);
+                    });
                 }
             }
 
@@ -158,7 +221,7 @@ function handleBuilders() {
             }
         }
 
-        var desiredBuilders = 2;
+        var desiredBuilders = 5;
 
         var site = spawn.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES);
         if (site != null) {
