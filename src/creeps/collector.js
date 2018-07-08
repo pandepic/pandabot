@@ -20,10 +20,20 @@ module.exports = {
             }
 
         } else {
-            var spawn = Game.spawns[creep.memory.origin];
+            var container = Game.spawns[creep.memory.origin];
 
-            if (creep.transfer(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(spawn);
+            if (container.energy == container.energyCapacity) {
+                container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: object => object.structureType == STRUCTURE_CONTAINER && object.store[RESOURCE_ENERGY] < object.storeCapacity
+                });
+            }
+
+            if (container == null) {
+                return;
+            }
+
+            if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(container);
             } else {
                 creep.say('🔄');
             }

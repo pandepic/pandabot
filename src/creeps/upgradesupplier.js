@@ -4,10 +4,16 @@ module.exports = {
 
     run: function (creep) {
         if (creep.carry.energy < 20) {
-            var spawn = Game.spawns[creep.memory.origin];
+            var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: object => object.structureType == STRUCTURE_CONTAINER && object.store[RESOURCE_ENERGY] >= 50
+            });
 
-            if (creep.withdraw(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(spawn);
+            if (container == null) {
+                container = Game.spawns[creep.memory.origin];
+            }
+
+            if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(container);
             } else {
                 creep.say('🔄');
             }
